@@ -50,9 +50,9 @@ CMD ["npm", "start"]
 
 ### Hot reload
 1. Build with: `docker build -t nodeapp:dev -f Dockerfile.dev .`
-2. Run with: `docker run -it --init --name node-app-dev -p8080:3000 -v :.:/app nodeapp:dev`
+2. Run with: `docker run -it --init --name node-app-dev -p8080:3000 -v ${pwd}:/app nodeapp:dev`
 
-We add `-v :.:/app` to mount the host folder to the container folder. This way, when we change a file in the host, it will be changed in the container too.
+We add `-v ${pwd}:/app` to mount the host folder to the container folder. This way, when we change a file in the host, it will be changed in the container too. I used `${pwd}` to get the current directory, but you can use the absolute path too.
 
 ```dockerfile
 # Base image
