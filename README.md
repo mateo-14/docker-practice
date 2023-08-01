@@ -52,7 +52,7 @@ CMD ["npm", "start"]
 1. Build with: `docker build -t nodeapp:dev -f Dockerfile.dev .`
 2. Run with: `docker run -it --init --name node-app-dev -p8080:3000 -v ${pwd}:/app nodeapp:dev`
 
-We add `-v ${pwd}:/app` to mount the host folder to the container folder. This way, when we change a file in the host, it will be changed in the container too. I used `${pwd}` to get the current directory, but you can use the absolute path too.
+We add `-v ${pwd}:/app` to mount the host folder to the container folder. This way, when we change a file in the host, it will be changed in the container too. I used `${pwd}` to get the current directory, but you can use the absolute path too. First argument is the path to the folder in the host machine, and the second is the path to the folder in the container. First argument as volume name as well.
 
 ```dockerfile
 # Base image
@@ -75,3 +75,29 @@ ENV LOG_FILE="./dev-logs.txt"
 # Run a command. This is the command that will be executed when the container is started.
 CMD ["npm", "dev"]
 ```
+
+## Networks
+Create a network: `docker network create <network_name>`
+
+### Run database container in a network
+Create postgres container: `docker run -it --name db --network docker-practice --network-alias db -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=admin postgres:15.3-alpine`
+- `--network <network_name>`: Add the container to the network
+- `--network-alias <network_alias>`: Set the container alias in the network
+- `-v`: Mount volume, first argument is the volume name, and the second is the path in the container. First argument can be a path too.
+
+Now, we can connect to the database using the alias `db` as the host, and the default port `5432`. We need to create the node app container in the same network to be able to connect to the database.
+
+### Run node app container in a network
+Create node app container: `docker run -it --init --name node-app-dev --network docker-practice -p8080:3000 -v ${pwd}:/app nodeapp:dev`
+
+
+## Useful docker run arguments/options
+- `-it`: Interactive mode. You can use `Ctrl + p + q` to detach from the container without stopping it.
+- `-rm`: Remove the container when it stops.
+- `-d`: Detached mode. Run the container in the background.
+- `-p <host_port>:<container_port>`: Map a port from the host to the container.
+- `-v <host_path>:<container_path>`: Mount a volume from the host to the container.
+- `-e <variable_name>=<variable_value>`: Set an environment variable.
+- `--name <container_name>`: Set the container name.
+- `--network <network_name>`: Add the container to the network.
+- `--network-alias <network_alias>`: Set the container alias in the network.
